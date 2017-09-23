@@ -1,0 +1,62 @@
+---
+- name: install privoxy
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+  with_items:
+    - privoxy
+  tags:
+    - prep
+
+- name: set privoxy listen all
+  lineinfile:
+    dest: /etc/privoxy/config
+    regexp: 'listen-address  localhost:8118'
+    line: 'listen-address  :8118'
+
+- name: restart privoxy
+  service:
+    name: privoxy
+    state: restarted
+
+- name: update deb
+  command: echo deb http://archive.ubuntu.com/ubuntu trusty-backports main universe | \
+        tee /etc/apt/sources.list.d/backports.list
+
+- name: apt update
+  command: apt update
+
+- name: install haproxy 1.5
+  command: apt install -y haproxy -t trusty-backports
+
+- name: copy pem file
+  template:
+    src: templates/vio.pem
+    dest: /etc/haproxy/vio.pem
+    owner: root
+    group: root
+    mode: 0640
+
+- name: set haproxy config
+  template:
+    src: templates/haproxy.cfg
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: 0640
+    backup: yes
+
+- name: restart haproxy
+  service:
+    name: haproxy
+    state: restarted
+
+
+
+- name: restart apache2
+  service:
+    name: apache2
+    state: restarted
+
+
+

@@ -1,0 +1,5 @@
+---
+- hosts: vdnet
+  remote_user: root
+  roles:
+    - { role: vdnet }
