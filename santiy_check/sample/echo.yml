@@ -1,0 +1,7 @@
+- hosts: ubuntu
+  gather_facts: no
+  tasks:
+    - name: echo cluster name
+      shell: echo {{ item }}
+      with_items:
+          - "{{ cluster_name | to_list }}"
